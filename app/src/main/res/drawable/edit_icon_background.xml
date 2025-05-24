@@ -1,0 +1,12 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#80000000"/> <!-- Semi-transparent black -->
+            <size android:width="44dp" android:height="44dp"/>
+        </shape>
+    </item>
+    <item android:drawable="@drawable/baseline_edit_square_24"
+        android:gravity="center"
+        android:width="24dp"
+        android:height="24dp"/>
+</layer-list>

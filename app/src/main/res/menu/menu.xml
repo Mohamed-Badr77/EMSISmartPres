@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/item_settings"
+        android:title = "Parameters"/>
+
+    <item
+        android:id="@+id/item_help"
+        android:title = "Aide"/>
+
+    <item
+        android:title="Plus"
+        android:icon="@android:drawable/ic_menu_more"
+        app:showAsAction="never">
+
+        <menu>
+            <item
+                android:id="@+id/item_about"
+                android:title = "à propos"/>
+            <item
+                android:id="@+id/item_logout"
+                android:title = "Déconnexion"/>
+        </menu>
+
+    </item>
+
+
+</menu>
