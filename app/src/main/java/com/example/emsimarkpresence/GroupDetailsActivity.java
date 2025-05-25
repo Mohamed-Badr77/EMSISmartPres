@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -167,14 +168,79 @@ public class GroupDetailsActivity extends AppCompatActivity {
     }
 
     private void showAddStudentDialog() {
-        // Implement dialog to add student to group
-        // You can use a dialog with a list of available students or a search functionality
-        Toast.makeText(this, "Add student functionality will be implemented here", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Student to Group");
+
+        // Get all available students
+        db.collection("students")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<String> studentNames = new ArrayList<>();
+                    List<String> studentIds = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : querySnapshot) {
+                        Student student = doc.toObject(Student.class);
+                        if (student != null) {
+                            studentNames.add(student.getName() + " (" + student.getEmail() + ")");
+                            studentIds.add(doc.getId());
+                        }
+                    }
+
+                    builder.setItems(studentNames.toArray(new String[0]), (dialog, which) -> {
+                        String selectedStudentId = studentIds.get(which);
+                        GroupManager.addStudentToGroup(groupId, selectedStudentId)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "Student added to group", Toast.LENGTH_SHORT).show();
+                                    loadStudents(); // Refresh the list
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Failed to add student: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    });
+
+                    builder.show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load students", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void showAddClassDialog() {
-        // Implement dialog to add class to group
-        Toast.makeText(this, "Add class functionality will be implemented here", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Class to Group");
+
+        // Get all available classes
+        db.collection("classes")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<String> classNames = new ArrayList<>();
+                    List<String> classIds = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : querySnapshot) {
+                        Class classObj = doc.toObject(Class.class);
+                        if (classObj != null) {
+                            classNames.add(classObj.getName());
+                            classIds.add(doc.getId());
+                        }
+                    }
+
+                    builder.setItems(classNames.toArray(new String[0]), (dialog, which) -> {
+                        String selectedClassId = classIds.get(which);
+                        GroupManager.linkGroupToClass(groupId, selectedClassId)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "Class added to group", Toast.LENGTH_SHORT).show();
+                                    loadClasses(); // Refresh the list
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Failed to add class: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    });
+
+                    builder.show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load classes", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void deleteGroup() {

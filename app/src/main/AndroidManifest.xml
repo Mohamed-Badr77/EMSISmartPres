@@ -52,7 +52,13 @@
             android:exported="false" />
         <activity
             android:name=".ViewClassesActivity"
-            android:exported="false"/>
+            android:label="View Classes"
+            android:parentActivityName=".HomePage"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomePage" />
+        </activity>
         <activity
             android:name=".GroupManagementActivity"
             android:label="Group Management"
@@ -81,6 +87,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <activity
+            android:name=".StudentManagementActivity"
+            android:label="Student Management"
+            android:parentActivityName=".HomePage">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomePage" />
+        </activity>
+
 
 
         <activity

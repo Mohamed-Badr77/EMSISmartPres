@@ -23,7 +23,7 @@ public class HomePage extends AppCompatActivity {
     private ImageView profileImage;
     private TextView welcomeText;
     private Button btnProfile, btnSettings, btnAI, btnMap, btnLogout, btnNotification;
-    private Button btnClassManagement, btnViewClasses, btnGroupManagement; // New buttons
+    private Button btnClassManagement, btnViewClasses, btnGroupManagement, btnStudentManagement; // New buttons
 
     // Firebase instances
     private FirebaseAuth mAuth;
@@ -51,6 +51,7 @@ public class HomePage extends AppCompatActivity {
         btnClassManagement = findViewById(R.id.btnClassManagement);
         btnViewClasses = findViewById(R.id.btnViewClasses);
         btnGroupManagement = findViewById(R.id.btnGroupManagement);
+        btnStudentManagement = findViewById(R.id.btnStudentManagement);
 
 
         // Load user data and image
@@ -117,6 +118,11 @@ public class HomePage extends AppCompatActivity {
 
         btnGroupManagement.setOnClickListener(v -> {
             startActivity(new Intent(HomePage.this, GroupManagementActivity.class));
+        });
+
+        // Add to your setupButtonListeners() method
+        btnStudentManagement.setOnClickListener(v -> {
+            startActivity(new Intent(HomePage.this, StudentManagementActivity.class));
         });
     }
 
