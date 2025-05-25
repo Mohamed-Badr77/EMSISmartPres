@@ -1,0 +1,76 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Status -->
+    <TextView
+        android:text="Status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"/>
+
+    <RadioGroup
+        android:id="@+id/radioStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioActive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Active"/>
+
+        <RadioButton
+            android:id="@+id/radioPaused"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Paused"/>
+
+        <RadioButton
+            android:id="@+id/radioCompleted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Completed"/>
+    </RadioGroup>
+
+    <!-- Groups -->
+    <TextView
+        android:text="Groups"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_marginTop="16dp"/>
+
+    <LinearLayout
+        android:id="@+id/groupContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"/>
+
+    <!-- Add New Group -->
+    <EditText
+        android:id="@+id/etNewGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="New Group Name"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/btnAddGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Group"
+        android:layout_gravity="end"/>
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>
