@@ -95,7 +95,8 @@ public class EditClassDialog extends Dialog {
 
     private void addGroupView(String groupName) {
         View groupView = LayoutInflater.from(getContext())
-                .inflate(R.layout.item_group, groupContainer, false);
+                .inflate(R.layout.item_group_edit, groupContainer, false); // Changed to new layout
+
         TextView tvGroup = groupView.findViewById(R.id.tvGroup);
         ImageButton btnRemove = groupView.findViewById(R.id.btnRemove);
 

@@ -262,6 +262,21 @@
                         android:textAllCaps="false"
                         app:iconGravity="textTop"
                         app:strokeColor="@color/gray_300" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGroupManagement"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="4dp"
+                        android:drawableTop="@drawable/baseline_map_24"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:text="Manage Groups"
+                        android:textAllCaps="false"
+                        app:iconGravity="textTop"
+                        app:strokeColor="@color/gray_300" />
                 </GridLayout>
             </com.google.android.material.card.MaterialCardView>
 

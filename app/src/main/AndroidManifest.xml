@@ -51,11 +51,42 @@
             android:name=".ChangePasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".ClassManagementActivity"
-            android:exported="false"/>
-        <activity
             android:name=".ViewClassesActivity"
             android:exported="false"/>
+        <activity
+            android:name=".GroupManagementActivity"
+            android:label="Group Management"
+            android:parentActivityName=".MainActivity">
+            <!-- Parent activity meta-data to support navigation -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".GroupDetailsActivity"
+            android:label="Group Details"
+            android:parentActivityName=".GroupManagementActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".GroupManagementActivity" />
+        </activity>
+
+        <activity
+            android:name=".ClassManagementActivity"
+            android:label="Class Management"
+            android:parentActivityName=".MainActivity"
+            tools:ignore="DuplicateActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+
+        <activity
+            android:name=".EditClassDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:label="Edit Class" />
 
         <activity
             android:name=".AuthentifyYourself"
