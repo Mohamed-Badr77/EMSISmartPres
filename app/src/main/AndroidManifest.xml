@@ -50,6 +50,12 @@
         <activity
             android:name=".ChangePasswordActivity"
             android:exported="false" />
+        <activity
+            android:name=".ClassManagementActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ViewClassesActivity"
+            android:exported="false"/>
 
         <activity
             android:name=".AuthentifyYourself"

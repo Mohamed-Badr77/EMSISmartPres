@@ -157,6 +157,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="2dp">
 
@@ -227,6 +228,37 @@
                         android:gravity="center"
                         android:padding="16dp"
                         android:text="Open Map"
+                        android:textAllCaps="false"
+                        app:iconGravity="textTop"
+                        app:strokeColor="@color/gray_300" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClassManagement"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="4dp"
+                        android:drawableTop="@drawable/baseline_map_24"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:text="Add a Course"
+                        android:textAllCaps="false"
+                        app:iconGravity="textTop"
+                        app:strokeColor="@color/gray_300" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnViewClasses"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:layout_rowWeight="1"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="4dp"
+                        android:drawableTop="@drawable/baseline_map_24"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:text="Check Current Courses"
                         android:textAllCaps="false"
                         app:iconGravity="textTop"
                         app:strokeColor="@color/gray_300" />

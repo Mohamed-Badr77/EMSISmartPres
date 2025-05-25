@@ -152,11 +152,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         setupLocationUpdates();
-        LatLng emsi = new LatLng(33.58931956959172, -7.605327086230895);
-        Marker marker = mMap.addMarker(new MarkerOptions().position(emsi).title("Marqueur à emsi centre"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(emsi, 10));
-        marker.setTag("destination");
 
+        // EMSI centre 1, avec zoom
+        LatLng emsiCentre1 = new LatLng(33.58931956959172, -7.605327086230895);
+        Marker marker1 = mMap.addMarker(new MarkerOptions().position(emsiCentre1).title("Marqueur à emsi centre"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(emsiCentre1, 10));
+        marker1.setTag("destination1");
+
+        // Centre 2
+        LatLng emsiCentre2 = new LatLng(33.59182308575353, -7.604469131305724);
+        Marker marker2 = mMap.addMarker(new MarkerOptions().position(emsiCentre2));
+        marker2.setTag("destination2");
+
+        // Roudani
+        LatLng roudani = new LatLng(33.58159648741802, -7.633421698171949);
+        Marker markerRoudani = mMap.addMarker(new MarkerOptions().position(roudani));
+        markerRoudani.setTag("roudani");
+
+        // Maarif
+        LatLng maarif = new LatLng(33.58370341139249, -7.642393871190839);
+        Marker markerMaarif = mMap.addMarker(new MarkerOptions().position(maarif));
+        markerMaarif.setTag("maarif");
+
+        // Les Orangers
+        LatLng lesOrangers = new LatLng(33.54155065396929, -7.673537171178561);
+        Marker markerOrangers = mMap.addMarker(new MarkerOptions().position(lesOrangers));
+        markerOrangers.setTag("orangers");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{

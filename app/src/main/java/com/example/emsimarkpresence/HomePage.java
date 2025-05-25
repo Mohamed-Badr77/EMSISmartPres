@@ -23,7 +23,7 @@ public class HomePage extends AppCompatActivity {
 
     private ImageView profileImage;
     private TextView welcomeText;
-    private Button btnProfile, btnSettings, btnAI, btnMap, btnLogout, btnNotification;
+    private Button btnProfile, btnSettings, btnAI, btnMap, btnLogout, btnNotification, btnClassManagement, btnViewClasses;
 
     // Firebase instances
     private FirebaseAuth mAuth;
@@ -49,6 +49,8 @@ public class HomePage extends AppCompatActivity {
         btnLogout = findViewById(R.id.buttonLogout);
         btnNotification = findViewById(R.id.notificationButton);
         profileImage = findViewById(R.id.profileImage);
+        btnClassManagement =  findViewById(R.id.btnClassManagement);
+        btnViewClasses = findViewById(R.id.btnViewClasses);
 
         // Load user data
         loadUserData();
@@ -74,6 +76,14 @@ public class HomePage extends AppCompatActivity {
             mAuth.signOut();
             startActivity(new Intent(HomePage.this, AuthentifyYourself.class));
             finish();
+        });
+
+        btnClassManagement.setOnClickListener(v -> {
+            startActivity(new Intent(HomePage.this, ClassManagementActivity.class));
+        });
+
+        btnViewClasses.setOnClickListener(v ->{
+            startActivity(new Intent(HomePage.this, ViewClassesActivity.class));
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
