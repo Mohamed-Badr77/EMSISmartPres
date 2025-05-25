@@ -39,6 +39,20 @@ public class GroupManager {
         return batch.commit();
     }
 
+    public static Task<Void> unlinkGroupFromClass(String groupId, String classId) {
+        WriteBatch batch = db.batch();
+
+        // Remove from group's classes
+        DocumentReference groupRef = db.collection("groups").document(groupId);
+        batch.update(groupRef, "classes." + classId, FieldValue.delete());
+
+        // Remove from class's groups
+        DocumentReference classRef = db.collection("classes").document(classId);
+        batch.update(classRef, "groups." + groupId, FieldValue.delete());
+
+        return batch.commit();
+    }
+
     // Add student to group
     public static Task<Void> addStudentToGroup(String groupId, String studentId) {
         return db.collection("groups").document(groupId)

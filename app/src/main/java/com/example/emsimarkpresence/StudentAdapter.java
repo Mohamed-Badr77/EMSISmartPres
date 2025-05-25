@@ -1,35 +1,61 @@
 package com.example.emsimarkpresence;
 
+import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentViewHolder> {
-    private List<Student> students;
-    private OnStudentClickListener listener;
+    private final List<Student> students;
+    private final Context context;
+    private OnStudentRemoveListener removeListener;
+    private OnStudentClickListener clickListener;
 
+    // Interface for click events
     public interface OnStudentClickListener {
         void onStudentClick(Student student);
         void onStudentLongClick(Student student);
     }
 
-    public StudentAdapter(List<Student> students) {
+    // Interface for removal events
+    public interface OnStudentRemoveListener {
+        void onStudentRemoved(Student student);
+    }
+
+    // Constructor with all parameters
+    public StudentAdapter(Context context, List<Student> students,
+                          OnStudentRemoveListener removeListener,
+                          OnStudentClickListener clickListener) {
+        this.context = context;
         this.students = students;
+        this.removeListener = removeListener;
+        this.clickListener = clickListener;
     }
 
-    public void setOnStudentClickListener(OnStudentClickListener listener) {
-        this.listener = listener;
+    // Constructor for removal only
+    public StudentAdapter(Context context, List<Student> students,
+                          OnStudentRemoveListener removeListener) {
+        this(context, students, removeListener, null);
     }
 
-    public void updateStudents(List<Student> newStudents) {
-        this.students = newStudents;
-        notifyDataSetChanged();
+    // Constructor for click only
+    public StudentAdapter(Context context, List<Student> students,
+                          OnStudentClickListener clickListener) {
+        this(context, students, null, clickListener);
+    }
+
+    // Minimal constructor - requires at least Context
+    public StudentAdapter(Context context, List<Student> students) {
+        this(context, students, null, null);
     }
 
     @NonNull
@@ -46,18 +72,32 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
         holder.bind(student);
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onStudentClick(student);
+            if (clickListener != null) {
+                clickListener.onStudentClick(student);
             }
         });
 
         holder.itemView.setOnLongClickListener(v -> {
-            if (listener != null) {
-                listener.onStudentLongClick(student);
-                return true;
+            if (clickListener != null) {
+                clickListener.onStudentLongClick(student);
             }
-            return false;
+
+            if (removeListener != null) {
+                showRemoveDialog(student);
+            }
+            return true;
         });
+    }
+
+    private void showRemoveDialog(Student student) {
+        new AlertDialog.Builder(context)
+                .setTitle("Remove Student")
+                .setMessage("Remove " + student.getName() + " from group?")
+                .setPositiveButton("Remove", (dialog, which) -> {
+                    removeListener.onStudentRemoved(student);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     @Override
@@ -65,9 +105,14 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
         return students.size();
     }
 
+    public void updateStudents(List<Student> newStudents) {
+        this.students.clear();
+        this.students.addAll(newStudents);
+        notifyDataSetChanged(); // This is crucial
+    }
+
     static class StudentViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvStudentName;
-        private TextView tvStudentEmail;
+        private final TextView tvStudentName, tvStudentEmail;
 
         public StudentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -78,6 +123,12 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
         public void bind(Student student) {
             tvStudentName.setText(student.getName());
             tvStudentEmail.setText(student.getEmail());
+
+            // Custom styling
+            tvStudentName.setTextSize(16);
+            tvStudentName.setTypeface(tvStudentName.getTypeface(), Typeface.BOLD);
+            tvStudentEmail.setTextSize(12);
+            tvStudentEmail.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray_600));
         }
     }
 }

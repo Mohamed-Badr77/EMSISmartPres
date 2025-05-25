@@ -1,7 +1,9 @@
 package com.example.emsimarkpresence;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,8 +15,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,18 +44,24 @@ public class StudentManagementActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Set up adapter with click listeners
-        adapter = new StudentAdapter(students);
-        adapter.setOnStudentClickListener(new StudentAdapter.OnStudentClickListener() {
-            @Override
-            public void onStudentClick(Student student) {
-                showEditStudentDialog(student);
-            }
+        // New version with proper constructor
+        adapter = new StudentAdapter(
+                this,               // Context
+                students,           // List<Student>
+                null,               // No removal listener
+                new StudentAdapter.OnStudentClickListener() {
+                    @Override
+                    public void onStudentClick(Student student) {
+                        showEditStudentDialog(student);
+                    }
 
-            @Override
-            public void onStudentLongClick(Student student) {
-                showDeleteConfirmation(student);
-            }
-        });
+                    @Override
+                    public void onStudentLongClick(Student student) {
+                        showDeleteConfirmation(student);
+                    }
+                }
+        );
+
         recyclerView.setAdapter(adapter);
 
         // Set up FAB
@@ -66,15 +77,18 @@ public class StudentManagementActivity extends AppCompatActivity {
         db.collection("students")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    students.clear();
+                    List<Student> tempList = new ArrayList<>(); // Create temporary list
                     for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                         Student student = document.toObject(Student.class);
                         if (student != null) {
                             student.setId(document.getId());
-                            students.add(student);
+                            tempList.add(student);
                         }
                     }
-                    adapter.updateStudents(students);
+                    // Update both the activity's list and adapter
+                    students.clear();
+                    students.addAll(tempList);
+                    adapter.updateStudents(tempList); // This should trigger notifyDataSetChanged()
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load students: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -161,20 +175,68 @@ public class StudentManagementActivity extends AppCompatActivity {
 
     private void showDeleteConfirmation(Student student) {
         new AlertDialog.Builder(this)
-                .setTitle("Delete Student")
-                .setMessage("Are you sure you want to delete " + student.getName() + "?")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    db.collection("students").document(student.getId())
-                            .delete()
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(this, "Student deleted", Toast.LENGTH_SHORT).show();
-                                loadStudents();
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(this, "Failed to delete student: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                .setTitle("Nuclear Option")
+                .setMessage("Delete " + student.getName() + " and scrub from ALL groups?")
+                .setPositiveButton("NUKE IT", (dialog, which) -> {
+                    // Show loading dialog
+                    ProgressDialog progress = new ProgressDialog(this);
+                    progress.setMessage("Terminating student existence...");
+                    progress.setCancelable(false);
+                    progress.show();
+
+                    // Step 1: Remove from all groups
+                    removeStudentFromAllGroups(student.getId())
+                            .addOnCompleteListener(removeTask -> {
+                                if (removeTask.isSuccessful()) {
+                                    // Step 2: Delete student document
+                                    deleteStudentDocument(student, progress);
+                                } else {
+                                    progress.dismiss();
+                                    Toast.makeText(this, "Failed to remove from groups: " +
+                                            removeTask.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                }
                             });
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("ABORT MISSION", null)
                 .show();
+    }
+
+    private Task<Void> removeStudentFromAllGroups(String studentId) {
+        // This query finds ALL groups containing this student
+        return db.collection("groups")
+                .whereEqualTo("students." + studentId, true)
+                .get()
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    // Batch delete all references
+                    WriteBatch batch = db.batch();
+                    for (DocumentSnapshot groupDoc : task.getResult()) {
+                        batch.update(groupDoc.getReference(),
+                                "students." + studentId, FieldValue.delete());
+                    }
+
+                    Log.d("FIREBASE", "Removing " + studentId + " from " +
+                            task.getResult().size() + " groups");
+
+                    return batch.commit();
+                });
+    }
+
+    private void deleteStudentDocument(Student student, ProgressDialog progress) {
+        db.collection("students").document(student.getId())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    progress.dismiss();
+                    Toast.makeText(this, "Student obliterated from existence", Toast.LENGTH_SHORT).show();
+                    loadStudents(); // Refresh your list
+                })
+                .addOnFailureListener(e -> {
+                    progress.dismiss();
+                    Toast.makeText(this, "Failed to delete student doc: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                });
     }
 }

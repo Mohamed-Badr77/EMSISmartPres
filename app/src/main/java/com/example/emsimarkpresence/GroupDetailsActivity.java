@@ -1,11 +1,14 @@
 package com.example.emsimarkpresence;
 
+import android.app.ProgressDialog;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,28 +16,31 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class GroupDetailsActivity extends AppCompatActivity {
+public class GroupDetailsActivity extends AppCompatActivity implements StudentAdapter.OnStudentRemoveListener, ClassRemoveListener {
+
     private String groupId;
     private Group currentGroup;
     private FirebaseFirestore db;
 
-    private TextView tvGroupName, tvCampus;
+    private TextView tvGroupName, tvCampus, tvNoStudents, tvNoClasses;
     private RecyclerView studentsRecyclerView, classesRecyclerView;
     private StudentAdapter studentAdapter;
     private ClassSimpleAdapter classAdapter;
     private List<Student> students = new ArrayList<>();
     private List<Class> classes = new ArrayList<>();
+
+    private Button btnAddStudent, btnAddClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,28 +61,91 @@ public class GroupDetailsActivity extends AppCompatActivity {
         // Initialize views
         tvGroupName = findViewById(R.id.tvGroupName);
         tvCampus = findViewById(R.id.tvCampus);
+        tvNoStudents = findViewById(R.id.tvNoStudents);
+        tvNoClasses = findViewById(R.id.tvNoClasses);
+        btnAddStudent = findViewById(R.id.btnAddStudent);
+        btnAddClass = findViewById(R.id.btnAddClass);
         studentsRecyclerView = findViewById(R.id.studentsRecyclerView);
         classesRecyclerView = findViewById(R.id.classesRecyclerView);
 
         // Setup students RecyclerView
-        studentAdapter = new StudentAdapter(students);
+        studentAdapter = new StudentAdapter(this, students, this);
         studentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         studentsRecyclerView.setAdapter(studentAdapter);
 
         // Setup classes RecyclerView
-        classAdapter = new ClassSimpleAdapter(classes);
+        classAdapter = new ClassSimpleAdapter(classes, this);
         classesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         classesRecyclerView.setAdapter(classAdapter);
+
+        // Set click listeners for buttons
+        btnAddStudent.setOnClickListener(v -> showAddStudentDialog());
+        btnAddClass.setOnClickListener(v -> showAddClassDialog());
+        findViewById(R.id.fabMain).setOnClickListener(v -> {
+            // Show options for what to add
+            showAddOptionsDialog();
+        });
 
         // Load group details
         loadGroupDetails();
     }
 
+    @Override
+    public void onStudentRemoved(Student student) {
+        GroupManager.removeStudentFromGroup(groupId, student.getId())
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Student removed", Toast.LENGTH_SHORT).show();
+                    // No need to call loadStudents() - snapshot listener handles it
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to remove student", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    @Override
+    public void onClassRemoved(Class classObj) {
+        ProgressDialog progress = new ProgressDialog(this);
+        progress.setMessage("Removing class...");
+        progress.show();
+
+        GroupManager.unlinkGroupFromClass(groupId, classObj.getId())
+                .addOnSuccessListener(aVoid -> {
+                    progress.dismiss();
+                    Toast.makeText(this, "Class removed", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    progress.dismiss();
+                    Toast.makeText(this, "Failed to remove class: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
+
+    private void showAddOptionsDialog() {
+        new AlertDialog.Builder(this)
+                .setItems(new String[]{"Add Student", "Add Class"}, (dialog, which) -> {
+                    if (which == 0) showAddStudentDialog();
+                    else showAddClassDialog();
+                })
+                .show();
+    }
+
+
+
+
     private void loadGroupDetails() {
+        ProgressDialog progress = new ProgressDialog(this);
+        progress.setMessage("Loading group...");
+        progress.show();
         db.collection("groups").document(groupId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
+                .addSnapshotListener((documentSnapshot, error) -> {
+                    progress.dismiss();
+                    if (error != null) {
+                        Toast.makeText(this, "Error listening to group: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
                         currentGroup = documentSnapshot.toObject(Group.class);
                         if (currentGroup != null) {
                             currentGroup.setId(documentSnapshot.getId());
@@ -85,13 +154,9 @@ public class GroupDetailsActivity extends AppCompatActivity {
                             loadClasses();
                         }
                     } else {
-                        Toast.makeText(this, "Group not found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Group no longer exists", Toast.LENGTH_SHORT).show();
                         finish();
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error loading group: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    finish();
                 });
     }
 
@@ -99,11 +164,14 @@ public class GroupDetailsActivity extends AppCompatActivity {
         if (currentGroup != null) {
             tvGroupName.setText(currentGroup.getName());
             tvCampus.setText(currentGroup.getCampus());
+
+            // Update the empty states immediately
+            updateEmptyStates();
         }
     }
 
     private void loadStudents() {
-        if (currentGroup.getStudents() != null) {
+        if (currentGroup.getStudents() != null && !currentGroup.getStudents().isEmpty()) {
             students.clear();
             for (Map.Entry<String, Boolean> entry : currentGroup.getStudents().entrySet()) {
                 String studentId = entry.getKey();
@@ -115,17 +183,20 @@ public class GroupDetailsActivity extends AppCompatActivity {
                                 student.setId(documentSnapshot.getId());
                                 students.add(student);
                                 studentAdapter.notifyDataSetChanged();
+                                updateEmptyStates();
                             }
                         })
                         .addOnFailureListener(e -> {
                             Toast.makeText(this, "Error loading student: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         });
             }
+        } else {
+            updateEmptyStates();
         }
     }
 
     private void loadClasses() {
-        if (currentGroup.getClasses() != null) {
+        if (currentGroup.getClasses() != null && !currentGroup.getClasses().isEmpty()) {
             classes.clear();
             for (Map.Entry<String, Boolean> entry : currentGroup.getClasses().entrySet()) {
                 String classId = entry.getKey();
@@ -137,13 +208,22 @@ public class GroupDetailsActivity extends AppCompatActivity {
                                 classObj.setId(documentSnapshot.getId());
                                 classes.add(classObj);
                                 classAdapter.notifyDataSetChanged();
+                                updateEmptyStates();
                             }
                         })
                         .addOnFailureListener(e -> {
                             Toast.makeText(this, "Error loading class: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         });
             }
+        } else {
+            updateEmptyStates();
         }
+    }
+
+    private void updateEmptyStates() {
+        // Show/hide empty state messages
+        tvNoStudents.setVisibility(students.isEmpty() ? View.VISIBLE : View.GONE);
+        tvNoClasses.setVisibility(classes.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -171,7 +251,6 @@ public class GroupDetailsActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Student to Group");
 
-        // Get all available students
         db.collection("students")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
@@ -190,8 +269,8 @@ public class GroupDetailsActivity extends AppCompatActivity {
                         String selectedStudentId = studentIds.get(which);
                         GroupManager.addStudentToGroup(groupId, selectedStudentId)
                                 .addOnSuccessListener(aVoid -> {
+                                    // No need to manually refresh - the snapshot listener will handle it
                                     Toast.makeText(this, "Student added to group", Toast.LENGTH_SHORT).show();
-                                    loadStudents(); // Refresh the list
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(this, "Failed to add student: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -209,7 +288,6 @@ public class GroupDetailsActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Class to Group");
 
-        // Get all available classes
         db.collection("classes")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
@@ -228,8 +306,8 @@ public class GroupDetailsActivity extends AppCompatActivity {
                         String selectedClassId = classIds.get(which);
                         GroupManager.linkGroupToClass(groupId, selectedClassId)
                                 .addOnSuccessListener(aVoid -> {
+                                    // No need to manually refresh
                                     Toast.makeText(this, "Class added to group", Toast.LENGTH_SHORT).show();
-                                    loadClasses(); // Refresh the list
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(this, "Failed to add class: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -264,54 +342,16 @@ public class GroupDetailsActivity extends AppCompatActivity {
     }
 
     // Simple adapter for students
-    private static class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentViewHolder> {
-        private final List<Student> students;
 
-        public StudentAdapter(List<Student> students) {
-            this.students = students;
-        }
-
-        @NonNull
-        @Override
-        public StudentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_student_simple, parent, false);
-            return new StudentViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull StudentViewHolder holder, int position) {
-            Student student = students.get(position);
-            holder.bind(student);
-        }
-
-        @Override
-        public int getItemCount() {
-            return students.size();
-        }
-
-        static class StudentViewHolder extends RecyclerView.ViewHolder {
-            private final TextView tvStudentName, tvStudentEmail;
-
-            public StudentViewHolder(@NonNull View itemView) {
-                super(itemView);
-                tvStudentName = itemView.findViewById(R.id.tvStudentName);
-                tvStudentEmail = itemView.findViewById(R.id.tvStudentEmail);
-            }
-
-            public void bind(Student student) {
-                tvStudentName.setText(student.getName());
-                tvStudentEmail.setText(student.getEmail());
-            }
-        }
-    }
 
     // Simple adapter for classes
-    private static class ClassSimpleAdapter extends RecyclerView.Adapter<ClassSimpleAdapter.ClassViewHolder> {
+    private class ClassSimpleAdapter extends RecyclerView.Adapter<ClassSimpleAdapter.ClassViewHolder> {
         private final List<Class> classes;
+        private final ClassRemoveListener removeListener;
 
-        public ClassSimpleAdapter(List<Class> classes) {
+        public ClassSimpleAdapter(List<Class> classes, ClassRemoveListener removeListener) {
             this.classes = classes;
+            this.removeListener = removeListener;
         }
 
         @NonNull
@@ -322,10 +362,23 @@ public class GroupDetailsActivity extends AppCompatActivity {
             return new ClassViewHolder(view);
         }
 
+
         @Override
         public void onBindViewHolder(@NonNull ClassViewHolder holder, int position) {
             Class classObj = classes.get(position);
             holder.bind(classObj);
+
+            holder.itemView.setOnLongClickListener(v -> {
+                new AlertDialog.Builder(v.getContext())  // Use holder item's context
+                        .setTitle("Remove Class")
+                        .setMessage("Remove " + classObj.getName() + " from group?")
+                        .setPositiveButton("Remove", (dialog, which) -> {
+                            removeListener.onClassRemoved(classObj);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                return true;
+            });
         }
 
         @Override
@@ -333,7 +386,8 @@ public class GroupDetailsActivity extends AppCompatActivity {
             return classes.size();
         }
 
-        static class ClassViewHolder extends RecyclerView.ViewHolder {
+
+        class ClassViewHolder extends RecyclerView.ViewHolder {
             private final TextView tvClassName;
 
             public ClassViewHolder(@NonNull View itemView) {
@@ -343,6 +397,9 @@ public class GroupDetailsActivity extends AppCompatActivity {
 
             public void bind(Class classObj) {
                 tvClassName.setText(classObj.getName());
+                // Make class name stand out
+                tvClassName.setTextSize(16);
+                tvClassName.setTypeface(tvClassName.getTypeface(), Typeface.BOLD);
             }
         }
     }
