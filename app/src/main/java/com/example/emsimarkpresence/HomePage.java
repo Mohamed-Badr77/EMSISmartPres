@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.google.android.material.card.MaterialCardView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -22,7 +22,8 @@ public class HomePage extends AppCompatActivity {
     // View declarations
     private ImageView profileImage;
     private TextView welcomeText;
-    private Button btnProfile, btnSettings, btnAI, btnMap, btnLogout, btnNotification;
+    private Button btnProfile, btnSettings, btnLogout, btnNotification;
+    private MaterialCardView btnMap, btnAI;
     private Button btnClassManagement, btnViewClasses, btnGroupManagement, btnStudentManagement; // New buttons
 
     // Firebase instances
@@ -40,7 +41,7 @@ public class HomePage extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // Initialize views
-        welcomeText = findViewById(R.id.welcome_text);
+        welcomeText = findViewById(R.id.tvUserName);
         btnProfile = findViewById(R.id.buttonProfile);
         btnSettings = findViewById(R.id.buttonSettings);
         btnAI = findViewById(R.id.buttonAI);

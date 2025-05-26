@@ -6,6 +6,12 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="notifications">Notifications</string>
+    <string name="assistant_name">Assistant EMSISMARTPRESENCE</string>
+    <string name="assistant_status">En ligne</string>
+    <string name="avatar_desc">Avatar de l’assistant</string>
+    <string name="send_desc">Envoyer</string>
+    <string name="prompt_hint">Tapez votre message…</string>
+    <string name="chat_list_desc">Liste de discussion</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
@@ -43,4 +49,5 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="profile_image_cd" />
 </resources>

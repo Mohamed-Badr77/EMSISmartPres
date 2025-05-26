@@ -1,22 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/assistantvirtuel"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@android:color/white"
+    tools:context=".Assistant_virtuel">
 
-    <!-- Chat message history -->
+    <!-- En-tête -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/assistantAvatar"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/chatbot"
+            android:contentDescription="Avatar de l’assistant" />
+
+        <TextView
+            android:id="@+id/assistantName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Assistant EMSI SMART PRESENCE"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/assistantStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="En ligne"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Historique des messages -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout"
         android:layout_above="@id/input_container"
         android:padding="8dp"
         android:clipToPadding="false"
-        android:scrollbars="vertical"/>
+        android:scrollbars="vertical" />
 
-    <!-- Input area at bottom -->
+    <!-- Zone de saisie -->
     <LinearLayout
         android:id="@+id/input_container"
         android:layout_width="match_parent"
@@ -24,7 +61,7 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="@color/white">
+        android:background="@android:color/white">
 
         <EditText
             android:id="@+id/prompt"
@@ -32,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Type your message..."
-            android:inputType="textCapSentences"
+            android:inputType="textCapSentences|textMultiLine"
             android:maxLines="3" />
 
         <Button
@@ -42,6 +79,7 @@
             android:layout_marginStart="8dp"
             android:text="Send"
             android:backgroundTint="@color/green"
-            android:textColor="@color/white"/>
+            android:textColor="@android:color/white" />
     </LinearLayout>
+
 </RelativeLayout>
