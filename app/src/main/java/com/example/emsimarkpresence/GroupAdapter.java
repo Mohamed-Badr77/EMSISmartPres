@@ -65,7 +65,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
 
         public void bind(Group group) {
             tvGroupName.setText(group.getName());
-            tvCampus.setText(group.getCampus());
+            tvCampus.setText(group.getCampus().toString());
 
             int studentCount = group.getStudents() != null ? group.getStudents().size() : 0;
             tvStudentCount.setText(studentCount + " students");

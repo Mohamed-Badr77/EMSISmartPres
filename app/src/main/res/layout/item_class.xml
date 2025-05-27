@@ -7,47 +7,52 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical"
+android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvClassName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+<!-- Your existing views -->
+<TextView
+    android:id="@+id/tvClassName"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="18sp"
+    android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/tvHours"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"/>
+<TextView
+    android:id="@+id/tvHours"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"/>
 
-        <TextView
-            android:id="@+id/tvGroups"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"/>
+<TextView
+    android:id="@+id/tvGroups"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"/>
 
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"/>
+<TextView
+    android:id="@+id/tvStatus"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"/>
 
-        <Button
-            android:id="@+id/btnEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="Edit"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/green"
-            android:textColor="@color/white"/>
-    </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+<Button
+    android:id="@+id/btnEdit"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="end"
+    android:text="Edit"
+    android:layout_marginTop="8dp"
+    android:backgroundTint="@color/green"
+    android:textColor="@color/white"
+    android:background="?android:attr/selectableItemBackgroundBorderless"/> <!-- Ripple for button -->
+</LinearLayout>
+    </com.google.android.material.card.MaterialCardView>

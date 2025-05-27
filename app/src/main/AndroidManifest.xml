@@ -43,6 +43,10 @@
         <activity
             android:name=".HomePage"
             android:exported="false" />
+
+        <activity
+            android:name=".DocumentsActivity"
+            android:exported="false" />
         <activity
             android:name=".Register"
             android:exported="true"
@@ -103,6 +107,8 @@
             android:name=".EditClassDialog"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:label="Edit Class" />
+
+
 
         <activity
             android:name=".AuthentifyYourself"

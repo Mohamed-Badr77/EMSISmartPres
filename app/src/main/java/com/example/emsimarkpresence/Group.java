@@ -6,9 +6,10 @@ import java.util.Map;
 public class Group {
     private String id;
     private String name;
-    private String campus;
+    private Campus campus;
     private Map<String, Boolean> students = new HashMap<>();
     private Map<String, Boolean> classes = new HashMap<>();
+    private Map<String, String> classTeachers = new HashMap<>();
 
     public Group() {
     }
@@ -29,11 +30,11 @@ public class Group {
         this.name = name;
     }
 
-    public String getCampus() {
+    public Campus getCampus() {
         return campus;
     }
 
-    public void setCampus(String campus) {
+    public void setCampus(Campus campus) {
         this.campus = campus;
     }
 
@@ -51,5 +52,14 @@ public class Group {
 
     public void setStudents(Map<String, Boolean> students) {
         this.students = students;
+
+    }
+
+    public Map<String, String> getClassTeachers() {
+        return classTeachers;
+    }
+
+    public void setClassTeachers(Map<String, String> classTeachers) {
+        this.classTeachers = classTeachers;
     }
 }

@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -27,24 +29,18 @@ public class GroupManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_management);
 
-        // Initialize RecyclerView
         groupsRecyclerView = findViewById(R.id.groupsRecyclerView);
         groupsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Initialize adapter with click listener
         adapter = new GroupAdapter(groups, group -> {
-            // Handle group click (e.g., open GroupDetailsActivity)
             Intent intent = new Intent(this, GroupDetailsActivity.class);
             intent.putExtra("groupId", group.getId());
             startActivity(intent);
         });
 
         groupsRecyclerView.setAdapter(adapter);
-
-        // Load groups
         loadGroups();
 
-        // Setup FAB
         findViewById(R.id.fabAddGroup).setOnClickListener(v -> showCreateGroupDialog());
     }
 
@@ -67,22 +63,28 @@ public class GroupManagementActivity extends AppCompatActivity {
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_create_group, null);
 
         EditText etName = view.findViewById(R.id.etGroupName);
-        EditText etCampus = view.findViewById(R.id.etCampus);
+        Spinner spinnerCampus = view.findViewById(R.id.spinnerCampus);
+
+        // Setup campus spinner
+        ArrayAdapter<Campus> campusAdapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, Campus.values());
+        campusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCampus.setAdapter(campusAdapter);
 
         builder.setView(view)
                 .setPositiveButton("Create", (dialog, which) -> {
                     String name = etName.getText().toString().trim();
-                    String campus = etCampus.getText().toString().trim();
+                    Campus campus = (Campus) spinnerCampus.getSelectedItem();
 
-                    if (name.isEmpty() || campus.isEmpty()) {
-                        Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                    if (name.isEmpty()) {
+                        Toast.makeText(this, "Please enter a group name", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     GroupManager.createGroup(name, campus)
                             .addOnSuccessListener(documentReference -> {
                                 Toast.makeText(this, "Group created!", Toast.LENGTH_SHORT).show();
-                                loadGroups(); // Refresh list
+                                loadGroups();
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();

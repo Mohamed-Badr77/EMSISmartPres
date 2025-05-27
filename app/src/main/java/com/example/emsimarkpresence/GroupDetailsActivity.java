@@ -16,10 +16,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -32,13 +32,14 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
     private String groupId;
     private Group currentGroup;
     private FirebaseFirestore db;
+    private String currentUserId;
 
     private TextView tvGroupName, tvCampus, tvNoStudents, tvNoClasses;
     private RecyclerView studentsRecyclerView, classesRecyclerView;
     private StudentAdapter studentAdapter;
     private ClassSimpleAdapter classAdapter;
     private List<Student> students = new ArrayList<>();
-    private List<Class> classes = new ArrayList<>();
+    private List<ClassModel> classes = new ArrayList<>();
 
     private Button btnAddStudent, btnAddClass;
 
@@ -52,6 +53,9 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
 
         // Get group ID from intent
         groupId = getIntent().getStringExtra("groupId");
+
+        currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         if (groupId == null) {
             Toast.makeText(this, "Group ID not provided", Toast.LENGTH_SHORT).show();
             finish();
@@ -103,12 +107,18 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
     }
 
     @Override
-    public void onClassRemoved(Class classObj) {
+    public void onClassRemoved(ClassModel classObj) {
         ProgressDialog progress = new ProgressDialog(this);
         progress.setMessage("Removing class...");
         progress.show();
 
-        GroupManager.unlinkGroupFromClass(groupId, classObj.getId())
+        // Get the teacher ID who owns this class (stored in the group)
+        String teacherId = currentGroup.getClassTeachers().get(classObj.getId());
+        if (teacherId == null) {
+            teacherId = currentUserId; // Fallback to current user if not found
+        }
+
+        GroupManager.unlinkGroupFromClass(groupId, classObj.getId(), teacherId)
                 .addOnSuccessListener(aVoid -> {
                     progress.dismiss();
                     Toast.makeText(this, "Class removed", Toast.LENGTH_SHORT).show();
@@ -118,6 +128,7 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
                     Toast.makeText(this, "Failed to remove class: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
 
@@ -163,7 +174,7 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
     private void updateUI() {
         if (currentGroup != null) {
             tvGroupName.setText(currentGroup.getName());
-            tvCampus.setText(currentGroup.getCampus());
+            tvCampus.setText(currentGroup.getCampus().toString());
 
             // Update the empty states immediately
             updateEmptyStates();
@@ -200,10 +211,16 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
             classes.clear();
             for (Map.Entry<String, Boolean> entry : currentGroup.getClasses().entrySet()) {
                 String classId = entry.getKey();
-                db.collection("classes").document(classId)
+                String teacherId = currentGroup.getClassTeachers().get(classId);
+                if (teacherId == null) {
+                    teacherId = currentUserId; // Fallback to current user if not found
+                }
+
+                db.collection("users").document(teacherId)
+                        .collection("classes").document(classId)
                         .get()
                         .addOnSuccessListener(documentSnapshot -> {
-                            Class classObj = documentSnapshot.toObject(Class.class);
+                            ClassModel classObj = documentSnapshot.toObject(ClassModel.class);
                             if (classObj != null) {
                                 classObj.setId(documentSnapshot.getId());
                                 classes.add(classObj);
@@ -288,25 +305,30 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Class to Group");
 
-        db.collection("classes")
+        // Load classes from the current user's subcollection
+        db.collection("users").document(currentUserId).collection("classes")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<String> classNames = new ArrayList<>();
                     List<String> classIds = new ArrayList<>();
 
                     for (DocumentSnapshot doc : querySnapshot) {
-                        Class classObj = doc.toObject(Class.class);
+                        ClassModel classObj = doc.toObject(ClassModel.class);
                         if (classObj != null) {
-                            classNames.add(classObj.getName());
+                            classNames.add(classObj.getClassName());
                             classIds.add(doc.getId());
                         }
                     }
 
+                    if (classNames.isEmpty()) {
+                        Toast.makeText(this, "You don't have any classes yet", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     builder.setItems(classNames.toArray(new String[0]), (dialog, which) -> {
                         String selectedClassId = classIds.get(which);
-                        GroupManager.linkGroupToClass(groupId, selectedClassId)
+                        GroupManager.linkGroupToClass(groupId, selectedClassId, currentUserId)
                                 .addOnSuccessListener(aVoid -> {
-                                    // No need to manually refresh
                                     Toast.makeText(this, "Class added to group", Toast.LENGTH_SHORT).show();
                                 })
                                 .addOnFailureListener(e -> {
@@ -317,7 +339,7 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
                     builder.show();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to load classes", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Failed to load your classes", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -346,10 +368,10 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
 
     // Simple adapter for classes
     private class ClassSimpleAdapter extends RecyclerView.Adapter<ClassSimpleAdapter.ClassViewHolder> {
-        private final List<Class> classes;
+        private final List<ClassModel> classes;
         private final ClassRemoveListener removeListener;
 
-        public ClassSimpleAdapter(List<Class> classes, ClassRemoveListener removeListener) {
+        public ClassSimpleAdapter(List<ClassModel> classes, ClassRemoveListener removeListener) {
             this.classes = classes;
             this.removeListener = removeListener;
         }
@@ -365,13 +387,13 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
 
         @Override
         public void onBindViewHolder(@NonNull ClassViewHolder holder, int position) {
-            Class classObj = classes.get(position);
+            ClassModel classObj = classes.get(position);
             holder.bind(classObj);
 
             holder.itemView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(v.getContext())  // Use holder item's context
                         .setTitle("Remove Class")
-                        .setMessage("Remove " + classObj.getName() + " from group?")
+                        .setMessage("Remove " + classObj.getClassName() + " from group?")
                         .setPositiveButton("Remove", (dialog, which) -> {
                             removeListener.onClassRemoved(classObj);
                         })
@@ -395,8 +417,8 @@ public class GroupDetailsActivity extends AppCompatActivity implements StudentAd
                 tvClassName = itemView.findViewById(R.id.tvClassName);
             }
 
-            public void bind(Class classObj) {
-                tvClassName.setText(classObj.getName());
+            public void bind(ClassModel classObj) {
+                tvClassName.setText(classObj.getClassName());
                 // Make class name stand out
                 tvClassName.setTextSize(16);
                 tvClassName.setTypeface(tvClassName.getTypeface(), Typeface.BOLD);

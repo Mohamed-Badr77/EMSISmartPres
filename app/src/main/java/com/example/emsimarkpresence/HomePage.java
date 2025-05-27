@@ -6,6 +6,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,9 +24,14 @@ public class HomePage extends AppCompatActivity {
     // View declarations
     private ImageView profileImage;
     private TextView welcomeText;
-    private Button btnProfile, btnSettings, btnLogout, btnNotification;
+
+    // These are MaterialButtons in your XML
+    private MaterialButton btnProfile, btnSettings, btnLogout, btnNotification;
+    private MaterialButton btnClassManagement, btnViewClasses, btnGroupManagement, btnStudentManagement;
+
+    // These are MaterialCardViews in your XML
     private MaterialCardView btnMap, btnAI;
-    private Button btnClassManagement, btnViewClasses, btnGroupManagement, btnStudentManagement; // New buttons
+    private MaterialCardView cardDocuments;
 
     // Firebase instances
     private FirebaseAuth mAuth;
@@ -42,18 +49,24 @@ public class HomePage extends AppCompatActivity {
 
         // Initialize views
         welcomeText = findViewById(R.id.tvUserName);
+
+        // MaterialButtons
         btnProfile = findViewById(R.id.buttonProfile);
         btnSettings = findViewById(R.id.buttonSettings);
-        btnAI = findViewById(R.id.buttonAI);
-        btnMap = findViewById(R.id.buttonMap);
         btnLogout = findViewById(R.id.buttonLogout);
         btnNotification = findViewById(R.id.notificationButton);
-        profileImage = findViewById(R.id.profileImage);
         btnClassManagement = findViewById(R.id.btnClassManagement);
         btnViewClasses = findViewById(R.id.btnViewClasses);
         btnGroupManagement = findViewById(R.id.btnGroupManagement);
         btnStudentManagement = findViewById(R.id.btnStudentManagement);
 
+        // MaterialCardViews
+        btnAI = findViewById(R.id.buttonAI);
+        btnMap = findViewById(R.id.buttonMap);
+        cardDocuments = findViewById(R.id.documents);
+
+        // ImageView
+        profileImage = findViewById(R.id.profileImage);
 
         // Load user data and image
         loadUserData();
@@ -80,12 +93,12 @@ public class HomePage extends AppCompatActivity {
 //            startActivity(new Intent(HomePage.this, SettingsActivity.class));
 //        });
 
-        // AI Assistant button
+        // AI Assistant button (MaterialCardView)
         btnAI.setOnClickListener(v -> {
             startActivity(new Intent(HomePage.this, Assistant_virtuel.class));
         });
 
-        // Map button
+        // Map button (MaterialCardView)
         btnMap.setOnClickListener(v -> {
             startActivity(new Intent(HomePage.this, MapsActivity.class));
         });
@@ -121,9 +134,13 @@ public class HomePage extends AppCompatActivity {
             startActivity(new Intent(HomePage.this, GroupManagementActivity.class));
         });
 
-        // Add to your setupButtonListeners() method
         btnStudentManagement.setOnClickListener(v -> {
             startActivity(new Intent(HomePage.this, StudentManagementActivity.class));
+        });
+
+        // Documents card (MaterialCardView)
+        cardDocuments.setOnClickListener(v -> {
+            startActivity(new Intent(HomePage.this, DocumentsActivity.class));
         });
     }
 
