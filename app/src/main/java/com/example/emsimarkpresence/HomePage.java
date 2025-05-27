@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.material.card.MaterialCardView;
@@ -22,9 +23,10 @@ public class HomePage extends AppCompatActivity {
     // View declarations
     private ImageView profileImage;
     private TextView welcomeText;
-    private Button btnProfile, btnSettings, btnLogout, btnNotification;
+    private Button btnLogout, btnNotification;
     private MaterialCardView btnMap, btnAI;
-    private Button btnClassManagement, btnViewClasses, btnGroupManagement, btnStudentManagement; // New buttons
+    private LinearLayout btnProfile, btnViewClasses, btnGroupManagement, btnStudentManagement;
+    private Button btnClassManagement; // New buttons
 
     // Firebase instances
     private FirebaseAuth mAuth;
@@ -43,7 +45,6 @@ public class HomePage extends AppCompatActivity {
         // Initialize views
         welcomeText = findViewById(R.id.tvUserName);
         btnProfile = findViewById(R.id.buttonProfile);
-        btnSettings = findViewById(R.id.buttonSettings);
         btnAI = findViewById(R.id.buttonAI);
         btnMap = findViewById(R.id.buttonMap);
         btnLogout = findViewById(R.id.buttonLogout);
