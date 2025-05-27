@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,12 +27,14 @@ public class HomePage extends AppCompatActivity {
     private TextView welcomeText;
 
     // These are MaterialButtons in your XML
-    private MaterialButton btnProfile, btnSettings, btnLogout, btnNotification;
-    private MaterialButton btnClassManagement, btnViewClasses, btnGroupManagement, btnStudentManagement;
+    private MaterialButton btnLogout, btnNotification;
+    private MaterialButton btnClassManagement;
 
     // These are MaterialCardViews in your XML
     private MaterialCardView btnMap, btnAI;
     private MaterialCardView cardDocuments;
+    private LinearLayout btnProfile, btnViewClasses, btnGroupManagement, btnStudentManagement;
+
 
     // Firebase instances
     private FirebaseAuth mAuth;
@@ -52,7 +55,7 @@ public class HomePage extends AppCompatActivity {
 
         // MaterialButtons
         btnProfile = findViewById(R.id.buttonProfile);
-        btnSettings = findViewById(R.id.buttonSettings);
+
         btnLogout = findViewById(R.id.buttonLogout);
         btnNotification = findViewById(R.id.notificationButton);
         btnClassManagement = findViewById(R.id.btnClassManagement);
