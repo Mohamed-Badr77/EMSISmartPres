@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHolder> {
     private List<ClassModel> classes = new ArrayList<>();
@@ -22,17 +23,16 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
     public interface OnClassActionListener {
         void onEditClass(ClassModel classModel);
         void onDeleteClass(ClassModel classModel);
+        void onStatusChanged(ClassModel classModel);
     }
 
     public ClassAdapter(Context context) {
         this.context = context;
     }
 
-
     public void setOnClassActionListener(OnClassActionListener listener) {
         this.editListener = listener;
     }
-
 
     public void setClasses(List<ClassModel> classes) {
         this.classes = classes;
@@ -58,6 +58,14 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
             }
         });
 
+        holder.btnChangeStatus.setOnClickListener(v -> {
+            ClassStatusEditDialog.show(context, classModel, updatedClass -> {
+                if (editListener != null) {
+                    editListener.onStatusChanged(updatedClass);
+                }
+            });
+        });
+
         holder.itemView.setOnLongClickListener(v -> {
             new AlertDialog.Builder(v.getContext())
                     .setTitle("Delete Class")
@@ -73,37 +81,45 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
         });
     }
 
-
-
-
-
     @Override
     public int getItemCount() {
         return classes.size();
     }
 
     static class ClassViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvClassName, tvHours, tvGroups, tvStatus;
-        private Button btnEdit;
+        private TextView tvClassName, tvWeeksAndHours, tvTotalHours, tvGroups, tvStatus;
+        private Button btnEdit, btnChangeStatus;
 
         public ClassViewHolder(@NonNull View itemView) {
             super(itemView);
             tvClassName = itemView.findViewById(R.id.tvClassName);
-            tvHours = itemView.findViewById(R.id.tvHours);
+            tvWeeksAndHours = itemView.findViewById(R.id.tvWeeksAndHours);
+            tvTotalHours = itemView.findViewById(R.id.tvTotalHours);
             tvGroups = itemView.findViewById(R.id.tvGroups);
             tvStatus = itemView.findViewById(R.id.tvStatus);
             btnEdit = itemView.findViewById(R.id.btnEdit);
+            btnChangeStatus = itemView.findViewById(R.id.btnChangeStatus);
         }
 
         public void bind(ClassModel classModel) {
             tvClassName.setText(classModel.getClassName());
-            tvHours.setText("Hours: " + classModel.getTotalHours());
 
-            // Update groups display to use groupMap if available
+            // Display weeks and hours per session
+            tvWeeksAndHours.setText(String.format(Locale.getDefault(),
+                    "%d weeks × %.1fh/session",
+                    classModel.getNumberOfWeeks(),
+                    classModel.getHoursPerSession()));
+
+            // Display total hours
+            tvTotalHours.setText(String.format(Locale.getDefault(),
+                    "Total: %.1f hours",
+                    classModel.getTotalHours()));
+
+            // Display selected groups count
             if (classModel.getGroupMap() != null && !classModel.getGroupMap().isEmpty()) {
-                tvGroups.setText("Groups: " + classModel.getGroupMap().size());
-            } else if (classModel.getGroups() != null && !classModel.getGroups().isEmpty()) {
-                tvGroups.setText("Groups: " + String.join(", ", classModel.getGroups()));
+                long selectedGroups = classModel.getGroupMap().values().stream()
+                        .mapToLong(selected -> selected ? 1 : 0).sum();
+                tvGroups.setText("Groups: " + selectedGroups + " selected");
             } else {
                 tvGroups.setText("Groups: None");
             }

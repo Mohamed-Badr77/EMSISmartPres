@@ -1,5 +1,5 @@
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
@@ -7,101 +7,102 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:orientation="vertical">
 
         <!-- Class Name -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:hint="Class Name">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etClassName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Total Hours -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:hint="Total Hours">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etTotalHours"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Groups -->
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Groups"
-            android:textSize="18sp"
-            android:layout_marginTop="16dp"/>
-
-        <LinearLayout
-            android:id="@+id/groupContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Groups will be added dynamically here -->
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btnAddGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+ Add Group"
-            android:layout_marginTop="8dp"/>
+            android:text="Class Name"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
 
-        <!-- Status -->
+        <EditText
+            android:id="@+id/etClassName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter class name"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Number of Weeks -->
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Number of Weeks"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etNumberOfWeeks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Status"
-            android:textSize="18sp"
-            android:layout_marginTop="16dp"/>
+            android:hint="Enter number of weeks (default: 7)"
+            android:inputType="number"
+            android:layout_marginBottom="16dp" />
 
-        <RadioGroup
-            android:id="@+id/radioStatus"
+        <!-- Hours per Session -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hours per Session"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etHoursPerSession"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:hint="Enter hours per session (e.g., 1.5 or 2)"
+            android:inputType="numberDecimal"
+            android:layout_marginBottom="8dp" />
 
-            <RadioButton
-                android:id="@+id/radioActive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Active"
-                android:checked="true"/>
+        <!-- Total Hours Display -->
+        <TextView
+            android:id="@+id/tvTotalHours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total Hours: 0"
+            android:textStyle="bold"
+            android:textColor="#2196F3"
+            android:layout_marginBottom="16dp" />
 
-            <RadioButton
-                android:id="@+id/radioPaused"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Paused"/>
+        <!-- Group Selection -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Groups"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
 
-            <RadioButton
-                android:id="@+id/radioCompleted"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Completed"/>
-        </RadioGroup>
+        <LinearLayout
+            android:id="@+id/groupSelectionContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- Group checkboxes will be added dynamically here -->
+
+        </LinearLayout>
+
+        <!-- Status info for new classes -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New classes will be created as 'Active'"
+            android:textStyle="italic"
+            android:textColor="#666666"
+            android:layout_marginBottom="24dp" />
 
         <!-- Save Button -->
         <Button
             android:id="@+id/btnSaveClass"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="@color/green"
-            android:text="Save Class" />
+            android:text="Save Class"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
+
 </ScrollView>

@@ -63,6 +63,10 @@ public class ViewClassesActivity extends AppCompatActivity {
             public void onDeleteClass(ClassModel classModel) {
                 showDeleteConfirmationDialog(classModel);
             }
+            @Override
+            public void onStatusChanged(ClassModel classModel) {
+                // Empty implementation if not needed
+            }
         });
     }
 

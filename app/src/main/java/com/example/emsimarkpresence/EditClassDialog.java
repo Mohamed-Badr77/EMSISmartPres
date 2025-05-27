@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class EditClassDialog extends Dialog {
     private EditText etNewGroup;
@@ -65,7 +66,7 @@ public class EditClassDialog extends Dialog {
         btnSave = findViewById(R.id.btnSave);
 
         // Load existing groups
-        for (String group : classModel.getGroups()) {
+        for (String group : classModel.getSelectedGroupNames()) {
             addGroupView(group);
         }
 
@@ -107,12 +108,12 @@ public class EditClassDialog extends Dialog {
     }
 
     private void updateClass() {
-        // Get updated groups
-        List<String> updatedGroups = new ArrayList<>();
+        // Get updated groups as a list first
+        List<String> updatedGroupNames = new ArrayList<>();
         for (int i = 0; i < groupContainer.getChildCount(); i++) {
             View view = groupContainer.getChildAt(i);
             TextView tvGroup = view.findViewById(R.id.tvGroup);
-            updatedGroups.add(tvGroup.getText().toString());
+            updatedGroupNames.add(tvGroup.getText().toString());
         }
 
         // Get updated status
@@ -122,16 +123,17 @@ public class EditClassDialog extends Dialog {
         else if (selectedId == R.id.radioPaused) status = "Paused";
         else status = "Completed";
 
+        // Update the class model
+        classModel.setSelectedGroups(updatedGroupNames);
+        classModel.setStatus(status);
+
         // Update Firestore
         db.collection("users").document(userId).collection("classes")
                 .document(documentId)
-                .update(
-                        "groups", updatedGroups,
-                        "status", status
-                )
+                .set(classModel) // Using set() instead of update() to ensure all fields are properly saved
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "Class updated!", Toast.LENGTH_SHORT).show();
-                    if(listener!=null){
+                    if(listener != null){
                         listener.onClassUpdated();
                     }
                     dismiss();
