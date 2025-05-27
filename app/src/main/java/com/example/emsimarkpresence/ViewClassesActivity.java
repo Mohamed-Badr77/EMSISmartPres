@@ -1,6 +1,7 @@
 package com.example.emsimarkpresence;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -26,6 +28,13 @@ public class ViewClassesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_classes);
+
+        FloatingActionButton fab = findViewById(R.id.fabAddClass);
+        fab.setOnClickListener(v -> {
+            // Launch your “add a class” screen
+            Intent intent = new Intent(ViewClassesActivity.this, ClassManagementActivity.class);
+            startActivity(intent);
+        });
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();

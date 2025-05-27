@@ -28,7 +28,6 @@ public class HomePage extends AppCompatActivity {
 
     // These are MaterialButtons in your XML
     private MaterialButton btnLogout, btnNotification;
-    private MaterialButton btnClassManagement;
 
     // These are MaterialCardViews in your XML
     private MaterialCardView btnMap, btnAI;
@@ -58,7 +57,6 @@ public class HomePage extends AppCompatActivity {
 
         btnLogout = findViewById(R.id.buttonLogout);
         btnNotification = findViewById(R.id.notificationButton);
-        btnClassManagement = findViewById(R.id.btnClassManagement);
         btnViewClasses = findViewById(R.id.btnViewClasses);
         btnGroupManagement = findViewById(R.id.btnGroupManagement);
         btnStudentManagement = findViewById(R.id.btnStudentManagement);
@@ -118,10 +116,6 @@ public class HomePage extends AppCompatActivity {
 //            startActivity(new Intent(HomePage.this, NotificationsActivity.class));
 //        });
 
-        // Class Management button
-        btnClassManagement.setOnClickListener(v -> {
-            startActivity(new Intent(HomePage.this, ClassManagementActivity.class));
-        });
 
         // View Classes button
         btnViewClasses.setOnClickListener(v -> {
