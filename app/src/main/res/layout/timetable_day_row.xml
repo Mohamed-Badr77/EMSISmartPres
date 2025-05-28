@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/dayName"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:gravity="center"
+        android:text="Day"
+        android:background="@color/white"
+        android:textColor="@color/black"/>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/slot1"
+        android:layout_width="120dp"
+        android:layout_height="80dp"
+        android:layout_margin="1dp"
+        app:cardCornerRadius="4dp"
+        app:strokeColor="@color/grey"
+        app:strokeWidth="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Slot 1"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/slot2"
+        android:layout_width="120dp"
+        android:layout_height="80dp"
+        android:layout_margin="1dp"
+        app:cardCornerRadius="4dp"
+        app:strokeColor="@color/grey"
+        app:strokeWidth="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Slot 2"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/slot3"
+        android:layout_width="120dp"
+        android:layout_height="80dp"
+        android:layout_margin="1dp"
+        app:cardCornerRadius="4dp"
+        app:strokeColor="@color/grey"
+        app:strokeWidth="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Slot 3"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/slot4"
+        android:layout_width="120dp"
+        android:layout_height="80dp"
+        android:layout_margin="1dp"
+        app:cardCornerRadius="4dp"
+        app:strokeColor="@color/grey"
+        app:strokeWidth="1dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Slot 4"/>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>
+

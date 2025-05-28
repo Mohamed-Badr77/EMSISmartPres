@@ -32,6 +32,7 @@ public class HomePage extends AppCompatActivity {
     // These are MaterialCardViews in your XML
     private MaterialCardView btnMap, btnAI;
     private MaterialCardView cardDocuments;
+    private MaterialCardView btnEmploi;
     private LinearLayout btnProfile, btnViewClasses, btnGroupManagement, btnStudentManagement;
 
 
@@ -65,136 +66,12 @@ public class HomePage extends AppCompatActivity {
         btnAI = findViewById(R.id.buttonAI);
         btnMap = findViewById(R.id.buttonMap);
         cardDocuments = findViewById(R.id.documents);
+        btnEmploi = findViewById(R.id.emploi);
 
-        // ImageView
-        profileImage = findViewById(R.id.profileImage);
-
-        // Load user data and image
-        loadUserData();
-        loadProfileImage();
-
-        // Set click listeners for all buttons
-        setupButtonListeners();
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        // Set up click listeners
+        btnEmploi.setOnClickListener(v -> {
+            Intent intent = new Intent(HomePage.this, TimetableActivity.class);
+            startActivity(intent);
         });
-    }
-
-    private void setupButtonListeners() {
-        // Profile button
-        btnProfile.setOnClickListener(v -> {
-            startActivity(new Intent(HomePage.this, ProfileActivity.class));
-        });
-
-        // Settings button
-//        btnSettings.setOnClickListener(v -> {
-//            startActivity(new Intent(HomePage.this, SettingsActivity.class));
-//        });
-
-        // AI Assistant button (MaterialCardView)
-        btnAI.setOnClickListener(v -> {
-            startActivity(new Intent(HomePage.this, Assistant_virtuel.class));
-        });
-
-        // Map button (MaterialCardView)
-        btnMap.setOnClickListener(v -> {
-            startActivity(new Intent(HomePage.this, MapsActivity.class));
-        });
-
-        // Logout button
-        btnLogout.setOnClickListener(v -> {
-            mAuth.signOut();
-            startActivity(new Intent(HomePage.this, AuthentifyYourself.class));
-            finish();
-        });
-
-        // Notification button
-//        btnNotification.setOnClickListener(v -> {
-//            startActivity(new Intent(HomePage.this, NotificationsActivity.class));
-//        });
-
-
-        // View Classes button
-        btnViewClasses.setOnClickListener(v -> {
-            startActivity(new Intent(HomePage.this, ViewClassesActivity.class));
-        });
-
-        // Profile Image click (if you want to make it clickable)
-        profileImage.setOnClickListener(v -> {
-            startActivity(new Intent(HomePage.this, ProfileActivity.class));
-        });
-
-        btnGroupManagement.setOnClickListener(v -> {
-            startActivity(new Intent(HomePage.this, GroupManagementActivity.class));
-        });
-
-        btnStudentManagement.setOnClickListener(v -> {
-            startActivity(new Intent(HomePage.this, StudentManagementActivity.class));
-        });
-
-        // Documents card (MaterialCardView)
-        cardDocuments.setOnClickListener(v -> {
-            startActivity(new Intent(HomePage.this, DocumentsActivity.class));
-        });
-    }
-
-    private void loadUserData() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            db.collection("users").document(user.getUid())
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            String firstName = documentSnapshot.getString("firstName");
-                            String lastName = documentSnapshot.getString("lastName");
-
-                            String welcomeMsg;
-                            if (firstName != null && lastName != null) {
-                                welcomeMsg = "Welcome, " + firstName + " " + lastName + "!";
-                            } else if (firstName != null) {
-                                welcomeMsg = "Welcome, " + firstName + "!";
-                            } else {
-                                welcomeMsg = "Welcome to EMSI Smart Presence!";
-                            }
-
-                            welcomeText.setText(welcomeMsg);
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Failed to load user data", Toast.LENGTH_SHORT).show();
-                    });
-        }
-    }
-
-    private void loadProfileImage() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            db.collection("users").document(user.getUid()).get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists() && documentSnapshot.contains("profileImageUrl")) {
-                            String imageUrl = documentSnapshot.getString("profileImageUrl");
-                            Glide.with(this)
-                                    .load(imageUrl)
-                                    .placeholder(R.drawable.default_logo)
-                                    .error(R.drawable.default_logo)
-                                    .circleCrop()
-                                    .into(profileImage);
-                        } else {
-                            Glide.with(this)
-                                    .load(R.drawable.default_logo)
-                                    .circleCrop()
-                                    .into(profileImage);
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Glide.with(this)
-                                .load(R.drawable.default_logo)
-                                .circleCrop()
-                                .into(profileImage);
-                    });
-        }
     }
 }
